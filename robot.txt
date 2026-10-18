@@ -1,0 +1,141 @@
+// motor driver (digital pins)
+int ENA = 9;  // right motor
+int In1 = 8;
+int In2 = 7;
+int ENB = 3;  // left motor
+int In3 = 5;
+int In4 = 4;
+
+int maxSpeed = 60;  // analog write pin (0 -> 255)
+
+// IR sensors (digital pins)
+int L_IR = 13;  // left IR sensor
+int C_IR = 11;  // central IR sensor
+int R_IR = 12;  // right IR sensor
+int B_IR = 10;  // back IR sensor
+int FR_IR = 6;  // front right IR sensor
+
+int L_IR_Value;
+int C_IR_Value;
+int R_IR_Value;
+int B_IR_Value;
+int FR_IR_Value;
+
+int white = 1;
+int black = 0;
+
+void setup() {
+  // IR sensors
+  pinMode(L_IR, INPUT);
+  pinMode(C_IR, INPUT);
+  pinMode(R_IR, INPUT);
+  pinMode(B_IR, INPUT);  // set the back sensor pin as input
+  pinMode(FR_IR, INPUT);  // set the front right sensor pin as input
+
+  // Motor control pins
+  pinMode(ENA, OUTPUT);
+  pinMode(ENB, OUTPUT);
+
+  analogWrite(ENA, maxSpeed);  // setting the speed (EN pin) to "maxSpeed"
+  analogWrite(ENB, maxSpeed+6);
+
+  pinMode(In1, OUTPUT);
+  pinMode(In2, OUTPUT);
+  pinMode(In3, OUTPUT);
+  pinMode(In4, OUTPUT);
+
+  Serial.begin(9600);  // Start serial communication for debugging
+}
+
+void forward() {
+  digitalWrite(In1, HIGH);
+  digitalWrite(In2, LOW);
+
+  digitalWrite(In3, HIGH);
+  digitalWrite(In4, LOW);
+}
+
+
+void left() {
+  digitalWrite(In1, HIGH);
+  digitalWrite(In2, LOW);
+
+  digitalWrite(In3, LOW);
+  digitalWrite(In4, HIGH);
+}
+
+void right() {
+  digitalWrite(In1, LOW);
+  digitalWrite(In2, HIGH);
+
+  digitalWrite(In3, HIGH);
+  digitalWrite(In4, LOW);
+}
+
+void stop() {
+  digitalWrite(In1, LOW);
+  digitalWrite(In2, LOW);
+
+  digitalWrite(In3, LOW);
+  digitalWrite(In4, LOW);
+}
+
+void loop() {
+  // Read IR sensor values
+  int L2_IR_Value = digitalRead(L_IR);
+  int C_IR_Value = digitalRead(C_IR);
+  int R2_IR_Value = digitalRead(R_IR);
+  int R1_IR_Value = digitalRead(B_IR);
+  int L1_IR_Value = digitalRead(FR_IR);
+
+  // Debugging output
+  Serial.print("L_IR: ");
+  Serial.print(L2_IR_Value);
+  Serial.print(" C_IR: ");
+  Serial.print(C_IR_Value);
+  Serial.print(" R_IR: ");
+  Serial.print(R2_IR_Value);
+  Serial.print(" B_IR: ");
+  Serial.print(R1_IR_Value);
+  Serial.print(" FR_IR: ");
+  Serial.println(L1_IR_Value);
+
+  // Bang-bang control with five sensors
+  if (L2_IR_Value == white && L1_IR_Value == white && C_IR_Value == white && R1_IR_Value == white && R2_IR_Value == white) {
+    forward();
+  } else if (L2_IR_Value == black && L1_IR_Value == black && C_IR_Value == white && R1_IR_Value == black && R2_IR_Value == black) {
+    forward();
+  } else if (L2_IR_Value == black && L1_IR_Value == black && C_IR_Value == black && R1_IR_Value == black && R2_IR_Value == black) {
+    forward();
+  } else if (L2_IR_Value == white && L1_IR_Value == white && C_IR_Value == black && R1_IR_Value == white && R2_IR_Value == white) {
+    forward();
+  } else if (L2_IR_Value == white && L1_IR_Value == black && C_IR_Value == white && R1_IR_Value == white && R2_IR_Value == white) {
+    right();
+  } else if (L2_IR_Value == white && L1_IR_Value == black && C_IR_Value == black && R1_IR_Value == white && R2_IR_Value == white) {
+    right();
+  } else if (L2_IR_Value == black && L1_IR_Value == black && C_IR_Value == white && R1_IR_Value == white && R2_IR_Value == white) {
+    right();
+  } else if (L2_IR_Value == black && L1_IR_Value == white && C_IR_Value == white && R1_IR_Value == white && R2_IR_Value == white) {
+    right();
+  } else if (L2_IR_Value == white && L1_IR_Value == black && C_IR_Value == black && R1_IR_Value == black && R2_IR_Value == black) {
+    right();
+  } else if (L2_IR_Value == black && L1_IR_Value == white && C_IR_Value == black && R1_IR_Value == black && R2_IR_Value == black) {
+    right();
+  } else if (L2_IR_Value == black && L1_IR_Value == white && C_IR_Value == white && R1_IR_Value == black && R2_IR_Value == black) {
+    right();
+  } else if (L2_IR_Value == white && L1_IR_Value == white && C_IR_Value == black && R1_IR_Value == black && R2_IR_Value == white) {
+    left();
+  } else if (L2_IR_Value == white && L1_IR_Value == white && C_IR_Value == white && R1_IR_Value == black && R2_IR_Value == white) {
+    left();
+  } else if (L2_IR_Value == white && L1_IR_Value == white && C_IR_Value == white && R1_IR_Value == black && R2_IR_Value == black) {
+    left();
+  } else if (L2_IR_Value == white && L1_IR_Value == white && C_IR_Value == white && R1_IR_Value == white && R2_IR_Value == black) {
+    left();
+  } else if (L2_IR_Value == black && L1_IR_Value == black && C_IR_Value == black && R1_IR_Value == black && R2_IR_Value == black) {
+    left();
+  } else if (L2_IR_Value == black && L1_IR_Value == black && C_IR_Value == black && R1_IR_Value == white && R2_IR_Value == black) {
+    left();
+  } else if (L2_IR_Value == black && L1_IR_Value == black && C_IR_Value == white && R1_IR_Value == white && R2_IR_Value == black) {
+    left();
+  } 
+}
